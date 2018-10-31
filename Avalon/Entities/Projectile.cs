@@ -30,12 +30,11 @@ namespace Avalon.Entities
 			Id = "P" + idCount.ToString();
 			idCount++;
 
-			shape = new RectangleShape(new Vector2f(radius, radius * 4))
+			shape = new RectangleShape(new Vector2f(radius, radius * 7))
 			{
 				Origin = new Vector2f(radius / 2, radius * 2),
 				Position = p
 			};
-			texture = TextureEngine.missleTexture;
 
 			this.direction = direction.ToRadians();
 			shape.Rotation = direction;
@@ -45,16 +44,10 @@ namespace Avalon.Entities
 			speed = components * scale;
 			SoundEngine.missleSound.Play();
 		}
+
 		public override void Draw(RenderWindow window, bool textures)
 		{
-			if (texture != null && textures)
-			{
-				shape.Texture = texture;
-			}
-			else
-			{
-				shape.Texture.Dispose();
-			}
+			UpdateTextures(textures, TextureEngine.missleTexture);
 			if (CheckBound(window, radius) != Edge.NULL) isExpired = true;
 			window.Draw(shape);
 		}

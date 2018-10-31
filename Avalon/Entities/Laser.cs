@@ -40,23 +40,16 @@ namespace Avalon.Entities
 				Origin = new Vector2f(radius / 2, length),
 				Position = p
 			};
-			texture = TextureEngine.laserTexture;
 
 			heading = direction.ToRadians();
 			shape.Rotation = direction;
 			Vector2f components = new Vector2f((float)Math.Sin(heading), (float)Math.Cos(heading) * -1);
 			SoundEngine.missleSound.Play();
 		}
+
 		public override void Draw(RenderWindow window, bool textures)
 		{
-			if (texture != null && textures)
-			{
-				shape.Texture = texture;
-			}
-			else
-			{
-				shape.Texture.Dispose();
-			}
+			UpdateTextures(textures, TextureEngine.laserTexture);
 			window.Draw(shape);
 		}
 

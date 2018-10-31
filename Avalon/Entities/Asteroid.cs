@@ -14,6 +14,7 @@ namespace Avalon.Entities
 		private float radius;
 		private float baseSpeed;
 		private float minRadiusForBreakApart;
+		private int textureN;
 
 		public float Radius { get => radius; }
 
@@ -37,18 +38,12 @@ namespace Avalon.Entities
 				Origin = o,
 				Position = p
 			};
-			texture = TextureEngine.asteroidTexture[textureNumber];
+			textureN = textureNumber;
 		}
+
 		public override void Draw(RenderWindow window, bool textures)
 		{
-			if (texture != null && textures)
-			{
-				shape.Texture = texture;
-			}
-			else
-			{
-				shape.Texture.Dispose();
-			}
+			UpdateTextures(textures, TextureEngine.asteroidTexture[textureN]);
 			Edge curEdge = CheckBound(window, radius);
 			if (curEdge != Edge.NULL) CrossingEdge(curEdge, window, radius);
 			window.Draw(shape);

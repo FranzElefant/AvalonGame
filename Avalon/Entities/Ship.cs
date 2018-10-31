@@ -1,4 +1,5 @@
-﻿using Avalon.Entities;
+﻿using Avalon.Core;
+using Avalon.Entities;
 using Avalon.Textures;
 using SFML.Graphics;
 using SFML.System;
@@ -24,6 +25,7 @@ namespace Avalon
 		private float speedLimit; //запас скорости
 		private float decayRate;       //Настройка инерции движение
 		private float angularDecayRate; //Затухание инерции вращения
+		private float angularSpeedLimit;
 
 		private float shipSize;			//Условный размер корабля
 
@@ -36,6 +38,7 @@ namespace Avalon
 		private long lastShotTimeStamp;
 		private long laserReserve; //Запас мощности лазера
 		private long laserLifetime; //Запас мощности лазера
+		private float laserActivationPercent; //Запас мощности лазера
 
 		private float angularChangeSpeed;
 
@@ -53,11 +56,13 @@ namespace Avalon
 			accelerationPower = Constants.Ship.accelerationPower;
 			laserReserve = Constants.Ship.laserLifeTime;
 			laserLifetime = Constants.Ship.laserLifeTime;
+			laserActivationPercent = Constants.Ship.laserActivationPercent;
 
 			//Инерция
 			speedLimit = Constants.Ship.speedLimit;
 			decayRate = Constants.Ship.decayRate;
 			angularDecayRate = Constants.Ship.angularDecayRate;
+			angularSpeedLimit = Constants.Ship.angularSpeedLimit;
 			#endregion
 
 			shape = new CircleShape(shipSize, 3)
@@ -66,7 +71,6 @@ namespace Avalon
 				Origin = new Vector2f(shipSize, shipSize),
 				Position = p
 			};
-			texture = TextureEngine.shipTexture;
 			speed = new Vector2f(0, 0); //направление скорости
 
 			// Двигатель
@@ -77,21 +81,25 @@ namespace Avalon
 				Rotation = shape.Rotation + 180f,
 				Position = p
 			};
-			jetShapeTexture = TextureEngine.flameTexture;
 		}
 
-		public override void Draw(RenderWindow window, bool textures)
+		public override void UpdateTextures(bool loadTextures, Texture texture)
 		{
-			if (texture != null && textures)
+			if (loadTextures)
 			{
 				shape.Texture = texture;
-				jetShape.Texture = jetShapeTexture;
+				jetShape.Texture = TextureEngine.flameTexture;
 			}
-			else
+			else if (shape.Texture != null && !loadTextures)
 			{
 				shape.Texture.Dispose();
 				jetShape.Texture.Dispose();
 			}
+		}
+
+		public override void Draw(RenderWindow window, bool textures)
+		{
+			UpdateTextures(textures, TextureEngine.shipTexture);
 			Edge curEdge = CheckBound(window, shipSize / 2);
 			if (curEdge != Edge.NULL) CrossingEdge(curEdge, window, shipSize / 2);
 			if (hasThrust) window.Draw(jetShape);
@@ -111,7 +119,7 @@ namespace Avalon
 			else ChargeShot(sw.ElapsedMilliseconds);
 
 			if (Keyboard.IsKeyPressed(Keyboard.Key.LControl) && laserReserve > 0 && wantsToLaser) wantsToLaser = true;
-			else if (Keyboard.IsKeyPressed(Keyboard.Key.LControl) && laserReserve/(laserLifetime*1.0) > 0.7) wantsToLaser = true;
+			else if (Keyboard.IsKeyPressed(Keyboard.Key.LControl) && laserReserve/(laserLifetime*1.0)*100.0 > laserActivationPercent) wantsToLaser = true;
 			else
 			{
 				ChargeLaser(sw.ElapsedMilliseconds);
@@ -142,7 +150,7 @@ namespace Avalon
 		}
 		public void Rotate(sbyte direction)
 		{
-			angularChangeSpeed += rotationPower * direction;
+			if (Math.Abs(angularChangeSpeed) < angularSpeedLimit) angularChangeSpeed += rotationPower * direction;
 			hasSpin = true;
 		}
 		/// <summary>
@@ -204,7 +212,7 @@ namespace Avalon
 
 		private void ChargeLaser(long milisecondsPassed)
 		{
-			laserReserve += (milisecondsPassed - shipTime)/3;
+			if (laserReserve<laserLifetime) laserReserve += (milisecondsPassed - shipTime)/3;
 		}
 
 		/// <summary>
@@ -280,6 +288,15 @@ namespace Avalon
 			{
 				return wantsToLaser;
 			}
+		}
+
+		public ScreenText GetLaserChargePercent(Font font)
+		{
+			int percent = (int)Math.Round(laserReserve/ (laserLifetime * 1.0) * 100.0f);
+			Color c = percent < laserActivationPercent ? Color.Red : Color.Green;
+			string laserState = percent < laserActivationPercent ? "LASER CHARGING:" : "LASER CHARGED:";
+			ScreenText scoreText = new ScreenText(laserState + percent.ToString() + "%", font, Constants.Fonts.bigFontSize, c);
+			return scoreText;
 		}
 	}
 }

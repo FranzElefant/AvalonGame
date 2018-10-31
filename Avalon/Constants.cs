@@ -25,7 +25,6 @@
 			public const int maxSize = 50;
 			public const int minSpeed = 3;
 			public const int maxSpeed = 25;
-
 			public const float baseSpeed = 5;
 			public const float minRadiusForBreakApart = 30;
 		}
@@ -54,16 +53,18 @@
 			public const float rotationPower = 10; //Сила вращения
 			public const float accelerationPower = 50; //Ускорение
 			public const long laserLifeTime = 5000; //мс
+			public const float laserActivationPercent = 70;
 
 			//Инерция
 			public const float speedLimit = 500; //запас скорости
+			public const float angularSpeedLimit = 350; //
 			public const float decayRate = 0.9f;        //Настройка инерции движение
 			public const float angularDecayRate = 0.7f; //Затухание инерции вращения
 		}
 
 		public class Projectile
 		{
-			public const float radius = 50; //Размер хитбокса
+			public const float radius = 15; //Размер хитбокса
 			public const float speed = 10000;   //скорость начальная
 			public const float maxSpeed = 50; //Максимальная скорость
 			public const float maxLifetime = 100; //Время существования, такты перерисовки
@@ -74,7 +75,7 @@
 		{
 			public const float radius = 30; //Размер хитбокса
 			public const float length = 3000;   //длина лазера
-			public const float baseDamage = 10000;
+			public const float baseDamage = 20;
 			public const float lifetime = 1; //существование лазера, такты перерисовки
 		}
 	}

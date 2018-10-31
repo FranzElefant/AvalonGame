@@ -37,7 +37,6 @@ namespace Avalon.Entities
 				Origin = o,
 				Position = p
 			};
-			texture = TextureEngine.ufoTexture;
 			// Полоса здоровья
 			lifeBar = new RectangleShape(new Vector2f(radius * 2, 10))
 			{
@@ -46,19 +45,24 @@ namespace Avalon.Entities
 				Position = new Vector2f(p.X, p.Y - radius*0.8f),
 			};
 		}
-		public override void Draw(RenderWindow window, bool textures)
+
+		public override void UpdateTextures(bool loadTextures, Texture texture)
 		{
-			if (texture != null && textures)
+			if (loadTextures)
 			{
 				shape.Texture = texture;
 				lifeBar.Texture = TextureEngine.lifeBarTexture[(int)(healthPoints / 10)];
 			}
-			else
+			else if (shape.Texture != null && !loadTextures)
 			{
 				shape.Texture.Dispose();
 				lifeBar.Texture.Dispose();
-				//lifeBar.FillColor = Color.Red;
 			}
+		}
+
+		public override void Draw(RenderWindow window, bool textures)
+		{
+			UpdateTextures(textures, TextureEngine.ufoTexture);
 			Edge curEdge = CheckBound(window, radius / 2);
 			if (curEdge != Edge.NULL) CrossingEdge(curEdge, window, radius / 2);
 			window.Draw(shape);

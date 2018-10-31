@@ -11,14 +11,19 @@ namespace Avalon
 		protected string id;
 		protected Shape shape;
 		protected Vector2f speed;
-		protected Texture texture;
 
 		abstract public void Draw(RenderWindow window, bool textureActive);
 		abstract public void Update(float dt, Stopwatch sw);
-
-		virtual protected void AddTexture(Texture t)
+		public virtual void UpdateTextures(bool loadTextures, Texture texture)
 		{
-			shape.Texture = t;
+			if (loadTextures)
+			{
+				shape.Texture = texture;
+			}
+			else if (shape.Texture != null && !loadTextures)
+			{
+				shape.Texture.Dispose();
+			}
 		}
 		/// <summary>
 		/// Проверка пересечения границ экрана для сущности

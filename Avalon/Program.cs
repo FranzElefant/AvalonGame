@@ -9,9 +9,7 @@ namespace Avalon
     {
         static void Main(string[] args)
         {
-			SoundEngine.Init();
-			TextureEngine.Init();
-			Avalon asteroidGame = new Avalon(1920, 1500, "Asteroids", Color.White);
+			Avalon asteroidGame = new Avalon(1920, 1500, "Asteroids", Color.Black);
 			asteroidGame.Run();
 		}
     }

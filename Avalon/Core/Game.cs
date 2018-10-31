@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Timers;
+using Avalon.Sounds;
+using Avalon.Textures;
 using SFML.Graphics;
 using SFML.Window;
 
@@ -15,6 +17,7 @@ namespace Avalon
 		protected Color clearColor;
 		protected Sprite backGround;
 		protected Font windowFont;
+		protected bool useTextures = true;
 		protected bool isPaused = false;
 		protected bool isGameOver = false;
 		protected long lastGameScore;
@@ -69,6 +72,19 @@ namespace Avalon
 					gameTimer.Start();
 				}
 			}
+
+			if ((e.Code == Keyboard.Key.Tab))
+			{
+				if (!useTextures)
+				{
+					useTextures = true;
+					TextureEngine.Init();
+				}
+				else if (useTextures)
+				{
+					useTextures = false;
+				}
+			}
 		}
 
 		protected void Window_Closed(object sender, EventArgs e)
@@ -79,13 +95,15 @@ namespace Avalon
 		public void Run()
 		{
 			Init();
+			SoundEngine.Init();
+			TextureEngine.LoadImages();
+			TextureEngine.Init();
 			// Главный цикл программы
 			while (window.IsOpen)
 			{
 				// Вызов обработчиков событий
 				window.DispatchEvents();
 				window.Clear(clearColor);
-				window.Draw(backGround);
 				if (isPaused)
 				{
 					gameTimer.Stop();

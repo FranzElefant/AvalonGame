@@ -3,7 +3,7 @@
   <Class Name="Avalon.Textures.TextureEngine" Collapsed="true">
     <Position X="0.5" Y="0.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAAAAAAAMAIAAAQAEAAQAAAEAAAAAAAAAAACAAAAAAA=</HashCode>
+      <HashCode>AAAAAAAAMAIAAAQAEAAQAAAEAAAAAQAAAAACAAAAAAA=</HashCode>
       <FileName>Assets\TextureEngine.cs</FileName>
     </TypeIdentifier>
   </Class>
@@ -12,27 +12,13 @@
     <Compartments>
       <Compartment Name="Nested Types" Collapsed="false" />
     </Compartments>
-    <NestedTypes>
-      <Class Name="Avalon.Avalon.ScoreText" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Core\Avalon.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Class>
-    </NestedTypes>
     <TypeIdentifier>
-      <HashCode>EBQEAQAAAACBAQAgAAUCAAAwIAAQAABxAAACAEBAAAA=</HashCode>
+      <HashCode>EBQEAQAAAACBQQAgAAUCAAAwIAAQAABxAAACAEBAAAA=</HashCode>
       <FileName>Core\Avalon.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Avalon.Game" Collapsed="true">
     <Position X="4.25" Y="0.75" Width="1.5" />
-    <NestedTypes>
-      <Enum Name="Avalon.Game.Edge" Collapsed="true">
-        <TypeIdentifier>
-          <NewMemberFileName>Core\Game.cs</NewMemberFileName>
-        </TypeIdentifier>
-      </Enum>
-    </NestedTypes>
     <TypeIdentifier>
       <HashCode>EAQAAAEAAACAAAggAAAAAACAKAAAAACIAAQCAEAAIAo=</HashCode>
       <FileName>Core\Game.cs</FileName>
@@ -74,38 +60,52 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Avalon.Entities.Asteroid" Collapsed="true">
-    <Position X="1.75" Y="4.25" Width="1.5" />
+    <Position X="0.5" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>CAQYAAACCCAAAgAACAAAAAAAAAAAAAAAAAAAACIQAIA=</HashCode>
+      <HashCode>CAQYAAACCAAAAgAACAAAAAAAAAAAAAAAAAAAACIQAIA=</HashCode>
       <FileName>Entities\Asteroid.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Avalon.Entity" Collapsed="true">
-    <Position X="0.5" Y="2.5" Width="1.5" />
+    <Position X="0.5" Y="2.25" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>AAQCAAAACAAAAgAAAAAAAAAAAAAAAwAAAAQAAAAgBgA=</HashCode>
+      <HashCode>AAQCAAAACCAAAgAAAAAAAAAAAAAAAwAAAAQAAAAgBgA=</HashCode>
       <FileName>Entities\Entity.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Avalon.Entities.Projectile" Collapsed="true">
-    <Position X="4" Y="4.25" Width="1.5" />
+    <Position X="2.5" Y="5" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>IAQAAQEICAAACgQIQAAAAAAAAgBAAAAAAAAAAAAAAIg=</HashCode>
+      <HashCode>AAQAAQAIAAAACgAIQAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
       <FileName>Entities\Projectile.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Avalon.Ship" Collapsed="true">
-    <Position X="6.25" Y="4.25" Width="1.5" />
+    <Position X="6.25" Y="3.75" Width="1.5" />
     <TypeIdentifier>
-      <HashCode>ChQAgAUAAKBABgAEACAAAAgCEACIAgAAAAAEQgQwBCA=</HashCode>
+      <HashCode>ChQggAUQAIBABgAEAAAAAAgCEQCIAwEEAIAEQgSwBCA=</HashCode>
       <FileName>Entities\Ship.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Avalon.Entities.Ufo" Collapsed="true">
-    <Position X="8.75" Y="4.25" Width="1.5" />
+    <Position X="8.75" Y="3.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>EAQIAAACKAgAAkAACAAAAAAAAAAAAAAAAAAAACAQAIA=</HashCode>
       <FileName>Entities\Ufo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Avalon.Entities.Weapon" Collapsed="true">
+    <Position X="2.5" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEACAAAIAQAQEAAAAAAAgAAAAAAAAAAAAAAAIA=</HashCode>
+      <FileName>Entities\Weapon.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Avalon.Entities.Laser" Collapsed="true">
+    <Position X="4.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>IAQAAQAIAAAACgAIQAAAAAAAAAAAAAAAAAAAAAAAAAg=</HashCode>
+      <FileName>Entities\Laser.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Font Name="Segoe UI" Size="9" />

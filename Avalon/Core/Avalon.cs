@@ -1,4 +1,5 @@
-﻿using Avalon.Entities;
+﻿using Avalon.Core;
+using Avalon.Entities;
 using Avalon.Textures;
 using SFML.Graphics;
 using SFML.System;
@@ -32,26 +33,8 @@ namespace Avalon
 		private Edge[] edgeArray = (Edge[])Enum.GetValues(typeof(Edge));
 
 		//Тексты на экране
-		ScoreText scoreText;
-
-		protected class ScoreText
-		{
-			public Text text;
-			public ScoreText(string text, Font font, uint size, Color color)
-			{
-				this.text = new Text(text, font)
-				{
-					CharacterSize = size,
-					FillColor = color
-				};
-			}
-
-			public void UpdateText(string text)
-			{
-				this.text.DisplayedString = text;
-			}
-		}
-
+		ScreenText scoreText;
+		ScreenText laserChargeText;
 
 		public Avalon(uint width, uint height, string title, Color clrColor) : base(width, height, title, clrColor)
 		{
@@ -68,9 +51,7 @@ namespace Avalon
 
 			partedAsteroids = new HashSet<Asteroid>();
 
-			backGround = new Sprite(TextureEngine.spaceTexture);
-
-			scoreText = new ScoreText("Score: 0", windowFont, Constants.Fonts.bigFontSize, Color.White);
+			scoreText = new ScreenText("Score: 0", windowFont, Constants.Fonts.bigFontSize, Color.White);
 		}
 
 		public override void CleanUp()
@@ -206,30 +187,34 @@ namespace Avalon
 		/// </summary>
 		private void UpdateAndDraw()
 		{
+			backGround = new Sprite(TextureEngine.spaceTexture);
+			if (useTextures) window.Draw(backGround);
 			playerShip.Update(dt, gameTimer);
+			laserChargeText = playerShip.GetLaserChargePercent(windowFont);
+			DrawLaserChargeLevel(laserChargeText);
 			if (playerShip.WantsToShoot && playerShip.IsShotCharged) playerShip.Shoot(dictProjectiles);
 			if (playerShip.WantsToLaser && playerShip.IsShotCharged) playerShip.LaserAttack(dictLasers);
 			foreach (Asteroid a in dictAsteroids.Values)
 			{
 				a.Update(dt, gameTimer);
-				a.Draw(window, true);
+				a.Draw(window, useTextures);
 			}
 			foreach (Projectile p in dictProjectiles.Values)
 			{
 				p.Update(dt, gameTimer);
-				p.Draw(window, true);
+				p.Draw(window, useTextures);
 			}
 			foreach (Laser l in dictLasers.Values)
 			{
 				l.Update(dt, gameTimer);
-				l.Draw(window, true);
+				l.Draw(window, useTextures);
 			}
 			foreach (Ufo p in dictUfos.Values)
 			{
 				p.Update(dt, gameTimer);
-				p.Draw(window, true);
+				p.Draw(window, useTextures);
 			}
-			playerShip.Draw(window, true);
+			playerShip.Draw(window, useTextures);
 			UpdateScore();
 			window.Draw(scoreText.text);
 		}
@@ -359,6 +344,7 @@ namespace Avalon
 			Text menuText = new Text("PAUSE", windowFont, Constants.Fonts.ultraBigFontSize);
 			menuText.Position = new Vector2f(window.Size.X / 2 - Constants.Fonts.ultraBigFontSize, window.Size.Y / 2 - Constants.Fonts.ultraBigFontSize);
 			menuText.Style = Text.Styles.Bold;
+			if (useTextures) window.Draw(backGround);
 			window.Draw(menuText);
 		}
 
@@ -369,7 +355,15 @@ namespace Avalon
 			menuText.DisplayedString += Environment.NewLine;
 			menuText.DisplayedString += "Your score:" + lastGameScore;
 			menuText.Style = Text.Styles.Bold;
+			if (useTextures) window.Draw(backGround);
 			window.Draw(menuText);
+		}
+
+		public void DrawLaserChargeLevel(ScreenText t)
+		{
+			t.text.Position = new Vector2f(10f, window.Size.Y - Constants.Fonts.bigFontSize);
+			t.text.Style = Text.Styles.Bold;
+			window.Draw(t.text);
 		}
 	}
 }
