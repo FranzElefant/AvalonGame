@@ -14,6 +14,20 @@ namespace Avalon
 {
 	class Avalon : Game
 	{
+		private static Avalon avalonInstance;
+
+		public static Avalon GetGameInstance(uint width, uint height, String title, Color clrColor)
+		{
+			if (avalonInstance == null)
+				avalonInstance = new Avalon(width, height, title, clrColor);
+			return avalonInstance;
+		}
+
+		public static Avalon GetGameInstance()
+		{
+			return avalonInstance;
+		}
+
 		private Ship playerShip;
 		private Player player;
 
@@ -36,7 +50,7 @@ namespace Avalon
 		ScreenText scoreText;
 		ScreenText laserChargeText;
 
-		public Avalon(uint width, uint height, string title, Color clrColor) : base(width, height, title, clrColor)
+		private Avalon(uint width, uint height, string title, Color clrColor) : base(width, height, title, clrColor)
 		{
 			//NULL - это показатель того, что элемент внутри экрана
 			edgeArray = edgeArray.Where(x => x != Edge.NULL).ToArray();

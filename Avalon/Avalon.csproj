@@ -58,10 +58,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorythms.cs" />
+    <Compile Include="Actions\Movement.cs" />
+    <Compile Include="Actions\Reaction.cs" />
+    <Compile Include="Actions\Trajectory.cs" />
     <Compile Include="Core\Avalon.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Core\Helper.cs" />
     <Compile Include="Entities\Asteroid.cs" />
+    <Compile Include="Actions\Behavior.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Core\Game.cs" />
     <Compile Include="Core\Player.cs" />

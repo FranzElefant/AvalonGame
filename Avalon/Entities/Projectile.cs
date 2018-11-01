@@ -67,7 +67,7 @@ namespace Avalon.Entities
 			}
 		}
 
-		public override float HitDamage()
+		public override float Hit()
 		{
 			return baseDamage;
 		}

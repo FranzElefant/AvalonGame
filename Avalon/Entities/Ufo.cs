@@ -118,7 +118,7 @@ namespace Avalon.Entities
 					{
 						if (VectorExtension.Intersect(shipVertices[i], shipVertices[j], c, radius))
 						{
-							healthPoints -= proj.HitDamage();
+							healthPoints -= proj.Hit();
 							return true;
 						}
 					}
@@ -129,7 +129,7 @@ namespace Avalon.Entities
 
 		public void ChooseShipTarget(Ship s)
 		{
-			Vector2f shipOrigin = s.GetPosition();
+			Vector2f shipOrigin = s.Position();
 			var absoluteSpeed = speed.AbsoluteValue();
 			Vector2f targetSpeed = new Vector2f(shipOrigin.X - shape.Position.X, shipOrigin.Y - shape.Position.Y);
 			speed = targetSpeed.Normalize(absoluteSpeed);

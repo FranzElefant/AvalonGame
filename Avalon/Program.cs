@@ -9,7 +9,7 @@ namespace Avalon
     {
         static void Main(string[] args)
         {
-			Avalon asteroidGame = new Avalon(1920, 1500, "Asteroids", Color.Black);
+			Avalon asteroidGame = Avalon.GetGameInstance(1920, 1500, "Asteroids", Color.Black);
 			asteroidGame.Run();
 		}
     }

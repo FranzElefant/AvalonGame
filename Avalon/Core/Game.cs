@@ -121,6 +121,7 @@ namespace Avalon
 				window.Display();
 			}
 		}
+
 		public abstract void Init();
 		public abstract void DrawPause();
 		public abstract void DrawGameOver();
@@ -133,5 +134,15 @@ namespace Avalon
 		/// <param name="window"></param>
 		/// <param name="dt"></param>
 		public abstract void Update(RenderWindow window, float deltaTime);
+
+		public Stopwatch GameTimer()
+		{
+			return gameTimer;
+		}
+
+		public Window Window()
+		{
+			return window;
+		}
 	}
 }

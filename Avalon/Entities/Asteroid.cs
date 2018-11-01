@@ -25,7 +25,7 @@ namespace Avalon.Entities
 			minRadiusForBreakApart = Constants.Asteroid.minRadiusForBreakApart;
 			#endregion
 
-			this.Id = "A" + asteroidsCount.ToString();
+			Id = "A" + asteroidsCount.ToString();
 			asteroidsCount++;
 
 			radius = r;

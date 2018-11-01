@@ -14,9 +14,10 @@ namespace Avalon.Entities
 		protected float baseSpeed;
 		protected float maxSpeed;
 		protected float baseDamage;
-		protected float direction; //напрвление
+		protected float direction; //направление
 
-		abstract public float HitDamage();
+		abstract public float Hit();
+
 		public virtual List<Vector2f> GetVertices()
 		{
 			List<Vector2f> points = new List<Vector2f> { };
