@@ -8,10 +8,9 @@ namespace Avalon
 {
 	public abstract class Entity
 	{
-		protected float size; // условный размер любой сущности
 		protected string id;
+		protected float size; // условный размер любой сущности
 		protected Shape shape;
-		protected Behavior behavior;
 
 		abstract public void Draw(RenderWindow window, bool textureActive);
 		abstract public void Update(float dt, Stopwatch sw);
@@ -35,18 +34,14 @@ namespace Avalon
 			 get => shape.Position; set => shape.Position = value;
 		}
 
+		public float Rotation
+		{
+			get => shape.Rotation; set => shape.Rotation = value;
+		}
+
 		public float Size
 		{
 			get => size; set => size = value;
-		}
-
-		/// <summary>
-		/// Проверка пересечения границ экрана для сущности
-		/// </summary>
-		public bool InWindowBounds(Entity entity)
-		{
-			if (behavior.GetCrossedBound(entity) == Edge.NULL) return true;
-			return false;
 		}
 	}
 }

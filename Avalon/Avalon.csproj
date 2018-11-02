@@ -65,12 +65,13 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Core\Helper.cs" />
     <Compile Include="Entities\Asteroid.cs" />
-    <Compile Include="Actions\Behavior.cs" />
+    <Compile Include="Entities\BehavioralEntity.cs" />
     <Compile Include="Entities\Entity.cs" />
     <Compile Include="Core\Game.cs" />
     <Compile Include="Core\Player.cs" />
     <Compile Include="Entities\Laser.cs" />
     <Compile Include="Entities\Projectile.cs" />
+    <Compile Include="Entities\Target.cs" />
     <Compile Include="Entities\Ufo.cs" />
     <Compile Include="Entities\Weapon.cs" />
     <Compile Include="Program.cs" />

@@ -21,12 +21,6 @@ namespace Avalon
 		private float rotationPower; //Сила вращения
 		private float accelerationPower; //Ускорение
 
-		//Инерция
-		private float speedLimit; //запас скорости
-		private float decayRate;       //Настройка инерции движение
-		private float angularDecayRate; //Затухание инерции вращения
-		private float angularSpeedLimit;
-
 		private float shipSize;			//Условный размер корабля
 
 		private bool hasThrust = false; //Ускоряется в данный момент
