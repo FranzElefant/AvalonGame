@@ -3,18 +3,12 @@ using Avalon.Textures;
 using SFML.Graphics;
 using SFML.System;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Avalon.Game;
 
 namespace Avalon.Entities
 {
 	public class Laser : Weapon
 	{
-		private float heading;
 		private float lifeTimeCounter = 0.0f;
 		private float maxLifetime;
 
@@ -25,9 +19,12 @@ namespace Avalon.Entities
 
 		public Laser(Vector2f p, float direction)
 		{
+			BoundReflection = false;
+			movement = new Movement(this);
+			reaction = new Reaction();
 			#region Constants
-			radius = Constants.Laser.radius;
-			length = Constants.Laser.length;
+			size = Constants.Laser.radius;
+			var length = Constants.Laser.length;
 			baseDamage = Constants.Laser.baseDamage;
 			maxLifetime = Constants.Laser.lifetime;
 			#endregion
@@ -35,15 +32,14 @@ namespace Avalon.Entities
 			Id = "L" + idCount.ToString();
 			idCount++;
 
-			shape = new RectangleShape(new Vector2f(radius, length))
+			shape = new RectangleShape(new Vector2f(size, length))
 			{
-				Origin = new Vector2f(radius / 2, length),
+				Origin = new Vector2f(size / 2, length),
 				Position = p
 			};
 
-			heading = direction.ToRadians();
-			shape.Rotation = direction;
-			Vector2f components = new Vector2f((float)Math.Sin(heading), (float)Math.Cos(heading) * -1);
+			movement.Rotation = direction;
+			Vector2f components = new Vector2f((float)Math.Sin(movement.Rotation.ToRadians()), (float)Math.Cos(movement.Rotation.ToRadians()) * -1);
 			SoundEngine.missleSound.Play();
 		}
 
@@ -57,7 +53,7 @@ namespace Avalon.Entities
 		{
 			if (lifeTimeCounter > maxLifetime) isExpired = true;
 			lifeTimeCounter++;
-			shape.Position += speed;
+			base.Update(dt, sw);
 		}
 
 		public bool IsExpired

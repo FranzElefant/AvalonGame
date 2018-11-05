@@ -2,31 +2,31 @@
 {
 	public class Target
 	{
-		Entity e;
-		bool active;
-		sbyte direction;
+		public Entity entity;
+		public bool active;
+		public bool inversion;
 
-		Target() { }
+		public Target() { }
 
-		Target(Entity e, bool active, sbyte direction)
+		public Target(Entity e, bool active, bool invesion)
 		{
-			this.e = e;
+			this.entity = e;
 			this.active = active;
-			this.direction = direction;
+			this.inversion = invesion;
 		}
 
-		Target(Entity e, sbyte direction)
+		public Target(Entity e, bool inversion)
 		{
-			this.e = e;
+			this.entity = e;
 			this.active = true;
-			this.direction = direction;
+			this.inversion = inversion;
 		}
 
-		Target(Entity e)
+		public Target(Entity e)
 		{
-			this.e = e;
+			this.entity = e;
 			this.active = true;
-			this.direction = 1;
+			this.inversion = false;
 		}
 	}
 }

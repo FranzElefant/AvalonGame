@@ -7,8 +7,6 @@ namespace Avalon
 		public Trajectory() {}
 
 		public abstract Vector2f GetNextPoint(Vector2f position, Vector2f speed);
-
-		public abstract Vector2f GetNextPoint(Vector2f position, Vector2f speed, Vector2f target);
 	}
 
 	public class LineTrajectory : Trajectory
@@ -17,14 +15,6 @@ namespace Avalon
 
 		public override Vector2f GetNextPoint(Vector2f position, Vector2f speed)
 		{
-			return position + speed;
-		}
-
-		public override Vector2f GetNextPoint(Vector2f position, Vector2f speed, Vector2f target)
-		{
-			var absoluteSpeed = speed.AbsoluteValue();
-			Vector2f targetSpeed = new Vector2f(target.X - position.X, target.Y - position.Y);
-			speed = targetSpeed.Normalize(absoluteSpeed);
 			return position + speed;
 		}
 	}
@@ -41,11 +31,6 @@ namespace Avalon
 		{
 			return position + speed;
 		}
-
-		public override Vector2f GetNextPoint(Vector2f position, Vector2f speed, Vector2f target)
-		{
-			return position + speed;
-		}
 	}
 
 	public class RandomTrajectory : Trajectory
@@ -53,11 +38,6 @@ namespace Avalon
 		public RandomTrajectory() : base() { }
 
 		public override Vector2f GetNextPoint(Vector2f position, Vector2f speed)
-		{
-			return position + speed;
-		}
-
-		public override Vector2f GetNextPoint(Vector2f position, Vector2f speed, Vector2f targety)
 		{
 			return position + speed;
 		}

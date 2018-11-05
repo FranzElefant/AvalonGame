@@ -8,41 +8,38 @@ using static Avalon.Game;
 
 namespace Avalon.Entities
 {
-	class Ufo : Entity
+	class Ufo : BehavioralEntity
 	{
 		private static long ufoCount = 0;
 
-		private int radius;
-
-		private float healthPoints;
-		private float baseSpeed;
 		private Shape lifeBar;
-		public float Radius { get => radius; }
+		public float Radius { get => size; }
 
 		public Ufo(Vector2f p, Vector2f v)
 		{
+			movement = new Movement(this);
+			reaction = new Reaction();
+
 			#region Constants
-			radius = Constants.Ufo.baseSize;
-			healthPoints = Constants.Ufo.health;
+			size = Constants.Ufo.baseSize;
+			Health = Constants.Ufo.health;
 			#endregion
 
 			this.Id = "UFO" + ufoCount.ToString();
 			ufoCount++;
 
-			speed= v;
-			baseSpeed = v.AbsoluteValue();
-			Vector2f o = new Vector2f(radius, radius);
-			shape = new CircleShape(radius)
+			movement.Speed = v;
+			Vector2f o = new Vector2f(size, size);
+			shape = new CircleShape(size)
 			{
 				Origin = o,
 				Position = p
 			};
 			// Полоса здоровья
-			lifeBar = new RectangleShape(new Vector2f(radius * 2, 10))
+			lifeBar = new RectangleShape(new Vector2f(size * 2, 10))
 			{
-				//Scale = new Vector2f(1f, 1),
 				Origin = o,
-				Position = new Vector2f(p.X, p.Y - radius*0.8f),
+				Position = new Vector2f(p.X, p.Y - size*0.8f),
 			};
 		}
 
@@ -51,7 +48,7 @@ namespace Avalon.Entities
 			if (loadTextures)
 			{
 				shape.Texture = texture;
-				lifeBar.Texture = TextureEngine.lifeBarTexture[(int)(healthPoints / 10)];
+				lifeBar.Texture = TextureEngine.lifeBarTexture[(int)(Health / 10)];
 			}
 			else if (shape.Texture != null && !loadTextures)
 			{
@@ -63,81 +60,14 @@ namespace Avalon.Entities
 		public override void Draw(RenderWindow window, bool textures)
 		{
 			UpdateTextures(textures, TextureEngine.ufoTexture);
-			Edge curEdge = CheckBound(window, radius / 2);
-			if (curEdge != Edge.NULL) CrossingEdge(curEdge, window, radius / 2);
 			window.Draw(shape);
 			window.Draw(lifeBar);
 		}
 
 		public override void Update(float dt, Stopwatch sw)
 		{
-			Kinematics(dt);
-		}
-
-		private void Kinematics(float dt)
-		{
-			shape.Position += speed;
-			lifeBar.Position = new Vector2f(shape.Position.X, shape.Position.Y - radius);
-		}
-
-		public Vector2f GetCenterVertex()
-		{
-			return shape.Position;
-		}
-		/// <summary>
-		/// Проверка пересечения с кораблем
-		/// </summary>
-		public bool HasCollided(Ship s)
-		{
-			List<Vector2f> shipVertices = s.GetVertices(); //Точки корабля
-			Vector2f c = shape.Position;
-			for (int i = 0; i < shipVertices.Count; i++)
-			{
-				for (int j = i; j < shipVertices.Count; j++)
-				{
-					if (i != j)
-					{
-						if (VectorExtension.Intersect(shipVertices[i], shipVertices[j], c, radius)) return true;
-					}
-				}
-			}
-			return false;
-		}
-		/// <summary>
-		/// Проверка уничтожен ли астероид снарядом
-		/// </summary>
-		public bool ShouldExplode(Weapon proj)
-		{
-			List<Vector2f> shipVertices = proj.GetVertices(); //Точки снаряда
-			Vector2f c = shape.Position;
-			for (int i = 0; i < shipVertices.Count; i++)
-			{
-				for (int j = i; j < shipVertices.Count; j++)
-				{
-					if (i != j)
-					{
-						if (VectorExtension.Intersect(shipVertices[i], shipVertices[j], c, radius))
-						{
-							healthPoints -= proj.Hit();
-							return true;
-						}
-					}
-				}
-			}
-			return false;
-		}
-
-		public void ChooseShipTarget(Ship s)
-		{
-			Vector2f shipOrigin = s.Position();
-			var absoluteSpeed = speed.AbsoluteValue();
-			Vector2f targetSpeed = new Vector2f(shipOrigin.X - shape.Position.X, shipOrigin.Y - shape.Position.Y);
-			speed = targetSpeed.Normalize(absoluteSpeed);
-		}
-
-		public float GetHealth()
-		{
-			return healthPoints;
+			base.Update(dt, sw);
+			lifeBar.Position = new Vector2f(shape.Position.X, shape.Position.Y - size);
 		}
 	}
 }

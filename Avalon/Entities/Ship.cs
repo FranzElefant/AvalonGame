@@ -7,71 +7,63 @@ using SFML.Window;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Avalon.Game;
 
 namespace Avalon
 {
-	class Ship : Entity
+	class Ship : BehavioralEntity
 	{
 		//Констатнты
 		private int shotChargingTime; //Время для зарядки выстрелов из плазмогана
-		private float rotationPower; //Сила вращения
-		private float accelerationPower; //Ускорение
-
-		private float shipSize;			//Условный размер корабля
 
 		private bool hasThrust = false; //Ускоряется в данный момент
 		private bool hasSpin = false;   //Врщается в данный момент
 		private bool isShotCharged = false;
 		private bool wantsToShoot = false;
 		private bool wantsToLaser = false;
-		private long shipTime;
 		private long lastShotTimeStamp;
 		private long laserReserve; //Запас мощности лазера
 		private long laserLifetime; //Запас мощности лазера
 		private float laserActivationPercent; //Запас мощности лазера
 
-		private float angularChangeSpeed;
-
 		private Shape jetShape; //прорисовка двигателя
-		private Texture jetShapeTexture; //прорисовка двигателя
 
 		public Ship(Vector2f p)
 		{
 			Id = "S1";
 			#region Constants
-			shipSize = Constants.Ship.shipSize;
+			size = Constants.Ship.shipSize;
+
+			movement = new Movement(this);
+			reaction = new Reaction();
 
 			shotChargingTime = Constants.Ship.shotChargingTime;
-			rotationPower = Constants.Ship.rotationPower;
-			accelerationPower = Constants.Ship.accelerationPower;
 			laserReserve = Constants.Ship.laserLifeTime;
 			laserLifetime = Constants.Ship.laserLifeTime;
 			laserActivationPercent = Constants.Ship.laserActivationPercent;
 
+			movement.RotationPower = Constants.Ship.rotationPower;
+			movement.AccelerationPower = Constants.Ship.accelerationPower;
+
 			//Инерция
-			speedLimit = Constants.Ship.speedLimit;
-			decayRate = Constants.Ship.decayRate;
-			angularDecayRate = Constants.Ship.angularDecayRate;
-			angularSpeedLimit = Constants.Ship.angularSpeedLimit;
+			movement.SpeedLimit = Constants.Ship.speedLimit;
+			movement.SpeedDecayRate = Constants.Ship.speedDecayRate;
+			movement.AngularDecayRate = Constants.Ship.angularDecayRate;
+			movement.AngularSpeedLimit = Constants.Ship.angularSpeedLimit;
+
+			movement.Speed = new Vector2f(0, 0);
 			#endregion
 
-			shape = new CircleShape(shipSize, 3)
+			shape = new CircleShape(size, 3)
 			{
 				Scale = new Vector2f(1.3f, 1),
-				Origin = new Vector2f(shipSize, shipSize),
+				Origin = new Vector2f(size, size),
 				Position = p
 			};
-			speed = new Vector2f(0, 0); //направление скорости
-
 			// Двигатель
-			jetShape = new CircleShape(shipSize / 2, 3)
+			jetShape = new CircleShape(size / 2, 3)
 			{
 				Scale = new Vector2f(0.6f, 1),
-				Origin = new Vector2f(shipSize / 2, shipSize / 2.5f),
+				Origin = new Vector2f(size / 2, size / 2.5f),
 				Rotation = shape.Rotation + 180f,
 				Position = p
 			};
@@ -94,8 +86,6 @@ namespace Avalon
 		public override void Draw(RenderWindow window, bool textures)
 		{
 			UpdateTextures(textures, TextureEngine.shipTexture);
-			Edge curEdge = CheckBound(window, shipSize / 2);
-			if (curEdge != Edge.NULL) CrossingEdge(curEdge, window, shipSize / 2);
 			if (hasThrust) window.Draw(jetShape);
 			window.Draw(shape);
 			hasThrust = false;
@@ -104,10 +94,14 @@ namespace Avalon
 
 		public override void Update(float dt, Stopwatch sw)
 		{
-			if (Keyboard.IsKeyPressed(Keyboard.Key.Up)) Acceleration(-1);
+			if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
+			{
+				movement.Accelerate(-1);
+				hasThrust = true;
+			}
 
-			if (Keyboard.IsKeyPressed(Keyboard.Key.Right)) Rotate(1);
-			else if (Keyboard.IsKeyPressed(Keyboard.Key.Left)) Rotate(-1);
+			if (Keyboard.IsKeyPressed(Keyboard.Key.Right)) movement.Rotate(1);
+			else if (Keyboard.IsKeyPressed(Keyboard.Key.Left)) movement.Rotate(-1);
 
 			if (Keyboard.IsKeyPressed(Keyboard.Key.Space) && isShotCharged) wantsToShoot = true;
 			else ChargeShot(sw.ElapsedMilliseconds);
@@ -120,60 +114,27 @@ namespace Avalon
 				wantsToLaser = false;
 			}
 
-			shipTime = sw.ElapsedMilliseconds;
+			entityTime = sw.ElapsedMilliseconds;
 
-			Kinematics(dt);
+			base.Update(dt, sw);
 
 			jetShape.Position = GetEnginePostion();
 			jetShape.Rotation = shape.Rotation + 180f;
 		}
-		/// <summary>
-		/// Направление ускорения корабля
-		/// </summary>
-		public void Acceleration(sbyte direction)
-		{
-			float headingRads = shape.Rotation.ToRadians();
-			float xNew = (float)Math.Sin(headingRads) * accelerationPower * direction;
-			float yNew = (float)Math.Cos(headingRads) * accelerationPower * direction;
-
-			if (speed.AbsoluteValue() < speedLimit)
-			{
-				speed = new Vector2f(speed.X - xNew, speed.Y + yNew);
-				hasThrust = true;
-			}
-		}
-		public void Rotate(sbyte direction)
-		{
-			if (Math.Abs(angularChangeSpeed) < angularSpeedLimit) angularChangeSpeed += rotationPower * direction;
-			hasSpin = true;
-		}
-		/// <summary>
-		/// Инерция корабля
-		/// </summary>
-		private void Kinematics(float dt)
-		{
-			//Изменение показателей
-			shape.Position += speed * dt;
-			shape.Rotation += angularChangeSpeed * dt;
-
-			//Затухание движения ()
-			if (!hasThrust) speed = speed * decayRate;
-			if (!hasSpin) angularChangeSpeed = angularChangeSpeed * angularDecayRate;
-		}
 
 		public void Shoot(Dictionary<string, Projectile> dictProjectiles)
 		{
-			Projectile pleft = new Projectile(GetGunPositionLeft(), speed, shape.Rotation);
+			Projectile pleft = new Projectile(GetGunPositionLeft(), movement.Speed, shape.Rotation);
 			string key = pleft.Id;
 			dictProjectiles.Add(key, pleft);
 
-			Projectile pright = new Projectile(GetGunPositionRight(), speed, shape.Rotation);
+			Projectile pright = new Projectile(GetGunPositionRight(), movement.Speed, shape.Rotation);
 			key = pright.Id;
 			dictProjectiles.Add(key, pright);
 
 			wantsToShoot = false;
 			isShotCharged = false;
-			lastShotTimeStamp = shipTime;
+			lastShotTimeStamp = entityTime;
 		}
 
 		public void LaserAttack(Dictionary<string, Laser> dictLasers)
@@ -185,19 +146,6 @@ namespace Avalon
 			dictLasers.Add(key, l);
 		}
 
-		/// <summary>
-		/// Получение крайних координат объекта
-		/// </summary>
-		public List<Vector2f> GetVertices()
-		{
-			List<Vector2f> points = new List<Vector2f> { };
-			for (Byte i = 0; i < shape.GetPointCount(); i++)
-			{
-				points.Add(shape.Transform.TransformPoint(shape.GetPoint(i)));
-			}
-			return points;
-		}
-
 		private void ChargeShot(long milisecondsPassed)
 		{
 			if (milisecondsPassed - lastShotTimeStamp >= shotChargingTime) isShotCharged = true;
@@ -206,7 +154,7 @@ namespace Avalon
 
 		private void ChargeLaser(long milisecondsPassed)
 		{
-			if (laserReserve<laserLifetime) laserReserve += (milisecondsPassed - shipTime)/3;
+			if (laserReserve<laserLifetime) laserReserve += (milisecondsPassed - entityTime)/3;
 		}
 
 		/// <summary>

@@ -108,6 +108,7 @@ namespace Avalon
 			//Parallel.ForEach(asteroidsCopy, (a) =>
 			foreach (var a in dictAsteroids.Values)
 			{
+				//a.SetTarget(playerShip, false);
 				if (a.HasCollided(playerShip))
 				{
 					isGameOver = true;
@@ -118,7 +119,7 @@ namespace Avalon
 				foreach (Projectile p in dictProjectiles.Values)
 				{
 					if (p.IsExpired) objectForDelete.Add(p.Id);
-					else if (a.ShouldExplode(p))
+					else if (a.HasCollided(p))
 					{
 						Sounds.SoundEngine.explosionSound.Play();
 						objectForDelete.Add(a.Id);
@@ -131,7 +132,7 @@ namespace Avalon
 				foreach (Laser l in dictLasers.Values)
 				{
 					if (l.IsExpired) objectForDelete.Add(l.Id);
-					else if (a.ShouldExplode(l))
+					else if (a.HasCollided(l))
 					{
 						Sounds.SoundEngine.explosionSound.Play();
 						objectForDelete.Add(a.Id);
@@ -143,7 +144,7 @@ namespace Avalon
 			}
 			foreach (var u in dictUfos.Values)
 			{
-				u.ChooseShipTarget(playerShip);
+				u.SetTarget(playerShip, false);
 				if (u.HasCollided(playerShip))
 				{
 					isGameOver = true;
@@ -154,10 +155,10 @@ namespace Avalon
 				foreach (Projectile p in dictProjectiles.Values)
 				{
 					if (p.IsExpired) objectForDelete.Add(p.Id);
-					else if (u.ShouldExplode(p))
+					else if (u.HasDamaged(p))
 					{
 						objectForDelete.Add(p.Id);
-						if (u.GetHealth() < 0.0)
+						if (u.Health < 0.0)
 						{
 							Sounds.SoundEngine.explosionSound.Play();
 							objectForDelete.Add(u.Id);
@@ -168,10 +169,10 @@ namespace Avalon
 				foreach (Laser l in dictLasers.Values)
 				{
 					if (l.IsExpired) objectForDelete.Add(l.Id);
-					else if (u.ShouldExplode(l))
+					else if (u.HasDamaged(l))
 					{
 						objectForDelete.Add(l.Id);
-						if (u.GetHealth() < 0.0)
+						if (u.Health < 0.0)
 						{
 							Sounds.SoundEngine.explosionSound.Play();
 							objectForDelete.Add(u.Id);
@@ -239,8 +240,8 @@ namespace Avalon
 			foreach (Asteroid a in partedAsteroids)
 			{
 				Asteroid a1, a2;
-				a1 = SpawnAsteroid(a.GetCenterVertex(), (int)a.Radius / 2);
-				a2 = SpawnAsteroid(a.GetCenterVertex(), (int)a.Radius / 2);
+				a1 = SpawnAsteroid(a.Position, (int)a.Radius / 2);
+				a2 = SpawnAsteroid(a.Position, (int)a.Radius / 2);
 				dictAsteroids.Add(a1.Id, a1);
 				dictAsteroids.Add(a2.Id, a2);
 			}

@@ -1,8 +1,7 @@
 ﻿using SFML.Graphics;
 using SFML.System;
-using SFML.Window;
+using System.Collections.Generic;
 using System.Diagnostics;
-using static Avalon.Game;
 
 namespace Avalon
 {
@@ -11,6 +10,7 @@ namespace Avalon
 		protected string id;
 		protected float size; // условный размер любой сущности
 		protected Shape shape;
+		protected long entityTime;
 
 		abstract public void Draw(RenderWindow window, bool textureActive);
 		abstract public void Update(float dt, Stopwatch sw);
@@ -25,6 +25,19 @@ namespace Avalon
 			{
 				shape.Texture.Dispose();
 			}
+		}
+
+		/// <summary>
+		/// Получение крайних координат объекта
+		/// </summary>
+		public List<Vector2f> GetVertices()
+		{
+			List<Vector2f> points = new List<Vector2f> { };
+			for (uint i = 0; i < shape.GetPointCount(); i++)
+			{
+				points.Add(shape.Transform.TransformPoint(shape.GetPoint(i)));
+			}
+			return points;
 		}
 
 		public string Id { get => id; set => id = value; }

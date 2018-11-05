@@ -1,9 +1,6 @@
-﻿using SFML.System;
+﻿using Avalon.Entities;
+using SFML.System;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using static Avalon.Game;
 
 namespace Avalon
@@ -11,44 +8,48 @@ namespace Avalon
 	public class Movement
 	{
 		protected Entity e;
-		protected Trajectory trajectory;
-		protected Vector2f speed;
-		protected float rotation;
-		protected float angularSpeed;			//скорость вращения
-		protected float speedDecayRate;			//Настройка инерции движения
-		protected float angularDecayRate;       //Затухание инерции вращения
-		protected float speedLimit;				//предел скорости
-		protected float angularSpeedLimit;      //предел вращения объекта
+		protected Trajectory Trajectory;
+		public Vector2f Speed;
+		public float Rotation { set; get; }
+		public float AngularSpeed	{ set; get; }						//скорость вращения
+		public float SpeedDecayRate { set; get; } = 1.0f;				//Настройка инерции движения
+		public float AngularDecayRate  { set; get; } = 1.0f;			//Затухание инерции вращения
+		public float SpeedLimit		{ set; get; }                       //предел скорости
+		public float AngularSpeedLimit   { set; get; }					//предел вращения объекта
 
-		private float rotationPower;			//Сила вращения
-		private float accelerationPower;        //Ускорение
+		public float RotationPower { set; get; } = 0.0f;				//Сила вращения
+		public float AccelerationPower { set; get; } = 0.0f;			//Ускорение
 
-		public Movement()
+		public Movement(Entity e)
 		{
-			trajectory = new LineTrajectory();
+			this.e = e;
+			Trajectory = new LineTrajectory();
 		}
 
-		public Movement(Trajectory t)
+		public Movement(Entity e, Vector2f speed, Trajectory t)
 		{
-			trajectory = t;
+			this.e = e;
+			Trajectory = t;
+			this.Speed = speed;
 		}
 
-		public Movement(Vector2f speed, float rotation)
+		public Movement(Entity e, Vector2f speed, float rotation)
 		{
-			this.speed = speed;
-			this.rotation = rotation;
+			this.e = e;
+			Speed = speed;
+			Rotation = rotation;
 		}
 
 		/// <summary>
 		/// Установить скорость объект для преследования
 		/// </summary>
 		/// <param name="direction">1 - towards object, 0 - backward</param>
-		public void SetTargetPointSpeed(Entity target, sbyte direction)
+		public void SetTargetPointSpeed(Target t)
 		{
-			Vector2f shipOrigin = e.Position;
-			var absoluteSpeed = speed.AbsoluteValue();
-			Vector2f targetSpeed = new Vector2f(shipOrigin.X - e.Position.X, shipOrigin.Y - e.Position.Y);
-			speed = targetSpeed.Normalize(absoluteSpeed);
+			Vector2f targetOrigin = t.entity.Position;
+			var absoluteSpeed = Speed.AbsoluteValue();
+			Vector2f targetSpeed = new Vector2f(targetOrigin.X - e.Position.X, targetOrigin.Y - e.Position.Y);
+			Speed = targetSpeed.Normalize(absoluteSpeed, t.inversion);
 		}
 
 		/// <summary>
@@ -57,12 +58,13 @@ namespace Avalon
 		public void Move(float dt)
 		{
 			//Изменение показателей
-			e.Position += speed * dt;
-			e.Rotation += angularSpeed * dt;
+			e.Position = Trajectory.GetNextPoint(e.Position,Speed);
+			Rotation += AngularSpeed * dt;
+			e.Rotation = Rotation;
 
 			//Затухание движения (инерция)
-			speed = speed * speedDecayRate;
-			angularSpeed = angularSpeed * angularDecayRate;
+			Speed = Speed * SpeedDecayRate;
+			AngularSpeed = AngularSpeed * AngularDecayRate;
 		}
 
 		/// <summary>
@@ -70,12 +72,12 @@ namespace Avalon
 		/// </summary>
 		public void Accelerate(sbyte direction)
 		{
-			float headingRads = rotation.ToRadians();
-			float xNew = (float)Math.Sin(headingRads) * accelerationPower * direction;
-			float yNew = (float)Math.Cos(headingRads) * accelerationPower * direction;
-			if (speed.AbsoluteValue() < speedLimit)
+			float headingRads = e.Rotation.ToRadians();
+			float xNew = (float)Math.Sin(headingRads) * AccelerationPower * direction;
+			float yNew = (float)Math.Cos(headingRads) * AccelerationPower * direction;
+			if (Speed.AbsoluteValue() < SpeedLimit)
 			{
-				speed = new Vector2f(speed.X - xNew, speed.Y + yNew);
+				Speed = new Vector2f(Speed.X - xNew, Speed.Y + yNew);
 			}
 		}
 
@@ -84,13 +86,13 @@ namespace Avalon
 		/// </summary>
 		public void Rotate(sbyte direction)
 		{
-			if (Math.Abs(angularSpeed) < angularSpeedLimit) angularSpeed += rotationPower * direction;
+			if (Math.Abs(AngularSpeed) < AngularSpeedLimit) AngularSpeed += RotationPower * direction;
 		}
 
 		/// <summary>
 		/// Получение границы экрана, которую пересекли
 		/// </summary>
-		virtual protected Edge GetCrossedBound()
+		virtual public Edge GetCrossedBound()
 		{
 			if ((e.Position.X + e.Size) < 0.0) return Edge.LEFT;
 			else if ((e.Position.X - e.Size) > Avalon.GetGameInstance().Window().Size.X) return Edge.RIGHT;
@@ -113,15 +115,6 @@ namespace Avalon
 				else if (edge == Edge.UP) e.Position = new Vector2f(e.Position.X, window.Size.Y + e.Size);
 				else e.Position = new Vector2f(e.Position.X, -e.Size);
 			}
-		}
-
-		/// <summary>
-		/// Проверка пересечения границ экрана для сущности
-		/// </summary>
-		public bool InWindowBounds()
-		{
-			if (GetCrossedBound() == Edge.NULL) return true;
-			return false;
 		}
 	}
 }

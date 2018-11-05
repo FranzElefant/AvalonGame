@@ -50,15 +50,15 @@
 			public const float shipSize = 50; //Время для зарядки выстрелов из плазмогана
 
 			public const int shotChargingTime = 100; //Время для зарядки выстрелов из плазмогана (мс)
-			public const float rotationPower = 10; //Сила вращения
-			public const float accelerationPower = 50; //Ускорение
+			public const float rotationPower = 50; //Сила вращения
+			public const float accelerationPower = 1; //Ускорение
 			public const long laserLifeTime = 5000; //мс
 			public const float laserActivationPercent = 70;
 
 			//Инерция
 			public const float speedLimit = 500; //запас скорости
 			public const float angularSpeedLimit = 350; //
-			public const float decayRate = 0.9f;        //Настройка инерции движение
+			public const float speedDecayRate = 0.9f;        //Настройка инерции движение
 			public const float angularDecayRate = 0.7f; //Затухание инерции вращения
 		}
 

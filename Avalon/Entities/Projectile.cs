@@ -17,38 +17,39 @@ namespace Avalon.Entities
 
 		private static long idCount = 0;
 
-		public Projectile(Vector2f p, Vector2f v, float direction)
+		public Projectile(Vector2f p, Vector2f v, float rotation)
 		{
+			Id = "P" + idCount.ToString();
+			idCount++;
+			movement = new Movement(this);
 			#region Constants
-			radius = Constants.Projectile.radius;
+			size = Constants.Projectile.radius;
 			baseSpeed = Constants.Projectile.speed;
 			maxSpeed = Constants.Projectile.maxSpeed;
 			maxLifetime = Constants.Projectile.maxLifetime;
 			baseDamage = Constants.Projectile.baseDamage;
+			BoundReflection = false;
 			#endregion
 
-			Id = "P" + idCount.ToString();
-			idCount++;
-
-			shape = new RectangleShape(new Vector2f(radius, radius * 7))
+			shape = new RectangleShape(new Vector2f(size, size * 7))
 			{
-				Origin = new Vector2f(radius / 2, radius * 2),
+				Origin = new Vector2f(size / 2, size * 2),
 				Position = p
 			};
 
-			this.direction = direction.ToRadians();
-			shape.Rotation = direction;
-			Vector2f components = new Vector2f((float)Math.Sin(this.direction), (float)Math.Cos(this.direction) * -1);
+			movement.Rotation = rotation;
+			Vector2f components = new Vector2f((float)Math.Sin(movement.Rotation.ToRadians()), (float)Math.Cos(movement.Rotation.ToRadians()) * -1);
 			float scale = v.AbsoluteValue() / 100 + baseSpeed;
-			if (scale > maxSpeed) scale = maxSpeed;
-			speed = components * scale;
+			if (scale > maxSpeed) 
+			scale = maxSpeed;
+			movement.Speed = components * scale;
 			SoundEngine.missleSound.Play();
 		}
 
 		public override void Draw(RenderWindow window, bool textures)
 		{
 			UpdateTextures(textures, TextureEngine.missleTexture);
-			if (CheckBound(window, radius) != Edge.NULL) isExpired = true;
+			if (!InWindowBounds()) isExpired = true;
 			window.Draw(shape);
 		}
 
@@ -56,7 +57,7 @@ namespace Avalon.Entities
 		{
 			if (lifeTimeCounter > maxLifetime) isExpired = true;
 			lifeTimeCounter++;
-			shape.Position += speed;
+			base.Update(dt, sw);
 		}
 
 		public bool IsExpired

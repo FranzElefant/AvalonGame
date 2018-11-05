@@ -77,14 +77,15 @@ namespace Avalon
 			return (float)Math.Sqrt(dotItself);
 		}
 
-		public static Vector2f Normalize(this Vector2f v, float absoluteValue)
+		public static Vector2f Normalize(this Vector2f v, float absoluteValue, bool inversion)
 		{
 			if (v.Y != 0)
 			{
 				var c = v.X / v.Y;
 				var yNew = (Math.Abs(v.Y)/ v.Y)*(float)Math.Sqrt(absoluteValue * absoluteValue / (c * c + 1.0f));
 				var xNew = c * yNew;
-				return new Vector2f(xNew, yNew); 
+				if (!inversion) return new Vector2f(xNew, yNew);
+				return new Vector2f(-xNew, -yNew);
 			}
 			else
 			{
