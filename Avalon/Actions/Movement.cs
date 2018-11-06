@@ -97,7 +97,7 @@ namespace Avalon
 			if ((e.Position.X + e.Size) < 0.0) return Edge.LEFT;
 			else if ((e.Position.X - e.Size) > Avalon.GetGameInstance().Window().Size.X) return Edge.RIGHT;
 			else if ((e.Position.Y + e.Size) < 0) return Edge.UP;
-			else if ((e.Position.Y - e.Size) > Avalon.GetGameInstance().Window().Size.X) return Edge.DOWN;
+			else if ((e.Position.Y - e.Size) > Avalon.GetGameInstance().Window().Size.Y) return Edge.DOWN;
 			else return Edge.NULL;
 		}
 

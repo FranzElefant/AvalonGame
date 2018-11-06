@@ -7,12 +7,10 @@ using System.Diagnostics;
 
 namespace Avalon.Entities
 {
-	public class Laser : Weapon
+	public class Laser : Shot
 	{
 		private float lifeTimeCounter = 0.0f;
-		private float maxLifetime;
-
-		bool isExpired = false;
+		private float maxShapeLifetime;	//время существования отрисовки
 
 		// Static variable for unique ID creation
 		private static long idCount = 0;
@@ -26,7 +24,7 @@ namespace Avalon.Entities
 			size = Constants.Laser.radius;
 			var length = Constants.Laser.length;
 			baseDamage = Constants.Laser.baseDamage;
-			maxLifetime = Constants.Laser.lifetime;
+			maxShapeLifetime = Constants.Laser.lifetime;
 			#endregion
 
 			Id = "L" + idCount.ToString();
@@ -51,17 +49,9 @@ namespace Avalon.Entities
 
 		public override void Update(float dt, Stopwatch sw)
 		{
-			if (lifeTimeCounter > maxLifetime) isExpired = true;
+			if (lifeTimeCounter > maxShapeLifetime) isExpired = true;
 			lifeTimeCounter++;
 			base.Update(dt, sw);
-		}
-
-		public bool IsExpired
-		{
-			get
-			{
-				return isExpired;
-			}
 		}
 
 		public override float Hit()

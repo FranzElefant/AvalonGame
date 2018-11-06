@@ -32,8 +32,7 @@ namespace Avalon
 		private Player player;
 
 		// Элементы, находящиеся на экране
-		private Dictionary<string, Projectile> dictProjectiles;
-		private Dictionary<string, Laser> dictLasers;
+		private Dictionary<string, Shot> dictProjectiles;
 		private Dictionary<string, Asteroid> dictAsteroids;
 		private Dictionary<string, Ufo> dictUfos;
 
@@ -57,8 +56,7 @@ namespace Avalon
 			player = new Player();
 			rnd = new Random();
 			dictAsteroids = new Dictionary<string, Asteroid>();
-			dictProjectiles = new Dictionary<string, Projectile>();
-			dictLasers = new Dictionary<string, Laser>();
+			dictProjectiles = new Dictionary<string, Shot>();
 			dictUfos = new Dictionary<string, Ufo>();
 
 			objectForDelete = new HashSet<string>();
@@ -72,7 +70,6 @@ namespace Avalon
 		{
 			dictAsteroids.Clear();
 			dictProjectiles.Clear();
-			dictLasers.Clear();
 			dictUfos.Clear();
 			objectForDelete.Clear();
 			partedAsteroids.Clear();
@@ -116,7 +113,7 @@ namespace Avalon
 					return;
 				}
 				// Столкновение зарядов с астероидами
-				foreach (Projectile p in dictProjectiles.Values)
+				foreach (Shot p in dictProjectiles.Values)
 				{
 					if (p.IsExpired) objectForDelete.Add(p.Id);
 					else if (a.HasCollided(p))
@@ -124,19 +121,6 @@ namespace Avalon
 						Sounds.SoundEngine.explosionSound.Play();
 						objectForDelete.Add(a.Id);
 						objectForDelete.Add(p.Id);
-						if (a.WillBreakApart()) partedAsteroids.Add(a);
-						player.score++;
-					}
-				}
-				// Столкновение зарядов с астероидами
-				foreach (Laser l in dictLasers.Values)
-				{
-					if (l.IsExpired) objectForDelete.Add(l.Id);
-					else if (a.HasCollided(l))
-					{
-						Sounds.SoundEngine.explosionSound.Play();
-						objectForDelete.Add(a.Id);
-						objectForDelete.Add(l.Id);
 						if (a.WillBreakApart()) partedAsteroids.Add(a);
 						player.score++;
 					}
@@ -152,26 +136,12 @@ namespace Avalon
 					return;
 				}
 				// Столкновение зарядов с летающей тарелкой
-				foreach (Projectile p in dictProjectiles.Values)
+				foreach (Shot p in dictProjectiles.Values)
 				{
 					if (p.IsExpired) objectForDelete.Add(p.Id);
 					else if (u.HasDamaged(p))
 					{
 						objectForDelete.Add(p.Id);
-						if (u.Health < 0.0)
-						{
-							Sounds.SoundEngine.explosionSound.Play();
-							objectForDelete.Add(u.Id);
-							player.score += 10;
-						}
-					}
-				}
-				foreach (Laser l in dictLasers.Values)
-				{
-					if (l.IsExpired) objectForDelete.Add(l.Id);
-					else if (u.HasDamaged(l))
-					{
-						objectForDelete.Add(l.Id);
 						if (u.Health < 0.0)
 						{
 							Sounds.SoundEngine.explosionSound.Play();
@@ -190,7 +160,6 @@ namespace Avalon
 			foreach (string id in objectForDelete)
 			{
 				dictProjectiles.Remove(id);
-				dictLasers.Remove(id);
 				dictAsteroids.Remove(id);
 				dictUfos.Remove(id);
 			}
@@ -205,24 +174,18 @@ namespace Avalon
 			backGround = new Sprite(TextureEngine.spaceTexture);
 			if (useTextures) window.Draw(backGround);
 			playerShip.Update(dt, gameTimer);
-			laserChargeText = playerShip.GetLaserChargePercent(windowFont);
+			laserChargeText = playerShip.GetLaserChargePercentText(windowFont);
 			DrawLaserChargeLevel(laserChargeText);
-			if (playerShip.WantsToShoot && playerShip.IsShotCharged) playerShip.Shoot(dictProjectiles);
-			if (playerShip.WantsToLaser && playerShip.IsShotCharged) playerShip.LaserAttack(dictLasers);
+			if (playerShip.UsePrimaryWeapon || playerShip.UseSecondaryWeapon) playerShip.Shoot(dictProjectiles);
 			foreach (Asteroid a in dictAsteroids.Values)
 			{
 				a.Update(dt, gameTimer);
 				a.Draw(window, useTextures);
 			}
-			foreach (Projectile p in dictProjectiles.Values)
+			foreach (Shot p in dictProjectiles.Values)
 			{
 				p.Update(dt, gameTimer);
 				p.Draw(window, useTextures);
-			}
-			foreach (Laser l in dictLasers.Values)
-			{
-				l.Update(dt, gameTimer);
-				l.Draw(window, useTextures);
 			}
 			foreach (Ufo p in dictUfos.Values)
 			{

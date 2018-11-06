@@ -8,7 +8,7 @@ using static Avalon.Game;
 
 namespace Avalon
 {
-	public class BehavioralEntity : Entity
+	public abstract class BehavioralEntity : Entity
 	{
 		protected Movement movement;
 		protected Reaction reaction;
@@ -94,7 +94,7 @@ namespace Avalon
 		/// <summary>
 		/// Проверка уничтожен ли объект оружием + нанесение урона
 		/// </summary>
-		public bool HasDamaged(Weapon proj)
+		public bool HasDamaged(Shot proj)
 		{
 			List<Vector2f> shipVertices = proj.GetVertices(); //Точки снаряда
 			Vector2f c = shape.Position;

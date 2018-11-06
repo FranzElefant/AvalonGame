@@ -10,22 +10,15 @@ using System.Diagnostics;
 
 namespace Avalon
 {
-	class Ship : BehavioralEntity
+	class Ship : ArmedEntity, IHandle
 	{
 		//Констатнты
-		private int shotChargingTime; //Время для зарядки выстрелов из плазмогана
-
 		private bool hasThrust = false; //Ускоряется в данный момент
 		private bool hasSpin = false;   //Врщается в данный момент
-		private bool isShotCharged = false;
-		private bool wantsToShoot = false;
-		private bool wantsToLaser = false;
-		private long lastShotTimeStamp;
-		private long laserReserve; //Запас мощности лазера
-		private long laserLifetime; //Запас мощности лазера
-		private float laserActivationPercent; //Запас мощности лазера
 
 		private Shape jetShape; //прорисовка двигателя
+		private Weapon primaryWeapon1;
+		private Weapon primaryWeapon2;
 
 		public Ship(Vector2f p)
 		{
@@ -35,11 +28,6 @@ namespace Avalon
 
 			movement = new Movement(this);
 			reaction = new Reaction();
-
-			shotChargingTime = Constants.Ship.shotChargingTime;
-			laserReserve = Constants.Ship.laserLifeTime;
-			laserLifetime = Constants.Ship.laserLifeTime;
-			laserActivationPercent = Constants.Ship.laserActivationPercent;
 
 			movement.RotationPower = Constants.Ship.rotationPower;
 			movement.AccelerationPower = Constants.Ship.accelerationPower;
@@ -67,6 +55,10 @@ namespace Avalon
 				Rotation = shape.Rotation + 180f,
 				Position = p
 			};
+			//Оружие
+			primaryWeapon1 = new MissleGun();
+			primaryWeapon2 = new MissleGun();
+			secondaryWeapon = new LaserGun();
 		}
 
 		public override void UpdateTextures(bool loadTextures, Texture texture)
@@ -94,26 +86,7 @@ namespace Avalon
 
 		public override void Update(float dt, Stopwatch sw)
 		{
-			if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
-			{
-				movement.Accelerate(-1);
-				hasThrust = true;
-			}
-
-			if (Keyboard.IsKeyPressed(Keyboard.Key.Right)) movement.Rotate(1);
-			else if (Keyboard.IsKeyPressed(Keyboard.Key.Left)) movement.Rotate(-1);
-
-			if (Keyboard.IsKeyPressed(Keyboard.Key.Space) && isShotCharged) wantsToShoot = true;
-			else ChargeShot(sw.ElapsedMilliseconds);
-
-			if (Keyboard.IsKeyPressed(Keyboard.Key.LControl) && laserReserve > 0 && wantsToLaser) wantsToLaser = true;
-			else if (Keyboard.IsKeyPressed(Keyboard.Key.LControl) && laserReserve/(laserLifetime*1.0)*100.0 > laserActivationPercent) wantsToLaser = true;
-			else
-			{
-				ChargeLaser(sw.ElapsedMilliseconds);
-				wantsToLaser = false;
-			}
-
+			CheckButtonEvents(dt, sw);
 			entityTime = sw.ElapsedMilliseconds;
 
 			base.Update(dt, sw);
@@ -122,39 +95,24 @@ namespace Avalon
 			jetShape.Rotation = shape.Rotation + 180f;
 		}
 
-		public void Shoot(Dictionary<string, Projectile> dictProjectiles)
+		public override void Shoot(Dictionary<string, Shot> dictWeapon)
 		{
-			Projectile pleft = new Projectile(GetGunPositionLeft(), movement.Speed, shape.Rotation);
-			string key = pleft.Id;
-			dictProjectiles.Add(key, pleft);
-
-			Projectile pright = new Projectile(GetGunPositionRight(), movement.Speed, shape.Rotation);
-			key = pright.Id;
-			dictProjectiles.Add(key, pright);
-
-			wantsToShoot = false;
-			isShotCharged = false;
-			lastShotTimeStamp = entityTime;
-		}
-
-		public void LaserAttack(Dictionary<string, Laser> dictLasers)
-		{
-			Laser l = new Laser(GetLaserPosition(), shape.Rotation);
-			laserReserve -= 50;
-			string key = l.Id;
-			dictLasers.Clear();
-			dictLasers.Add(key, l);
-		}
-
-		private void ChargeShot(long milisecondsPassed)
-		{
-			if (milisecondsPassed - lastShotTimeStamp >= shotChargingTime) isShotCharged = true;
-			wantsToShoot = false;
-		}
-
-		private void ChargeLaser(long milisecondsPassed)
-		{
-			if (laserReserve<laserLifetime) laserReserve += (milisecondsPassed - entityTime)/3;
+			if (primaryWeapon1.IsWeaponCharged && usePrimaryWeapon)
+			{
+				Shot p1 = primaryWeapon1.Shoot(GetGunPositionLeft(), movement.Speed, movement.Rotation);
+				dictWeapon.Add(p1.Id, p1);
+			}
+			if (primaryWeapon2.IsWeaponCharged && usePrimaryWeapon)
+			{
+				Shot p2 = primaryWeapon2.Shoot(GetGunPositionRight(), movement.Speed, movement.Rotation);
+				dictWeapon.Add(p2.Id, p2);
+			}
+			if (secondaryWeapon.IsWeaponCharged && useSecondaryWeapon)
+			{
+				Shot p3 = secondaryWeapon.Shoot(GetLaserPosition(), movement.Speed, movement.Rotation);
+				dictWeapon.Add(p3.Id, p3);
+			}
+			usePrimaryWeapon = false;
 		}
 
 		/// <summary>
@@ -208,37 +166,29 @@ namespace Avalon
 			Vector2f d = (p1 - p2) / 2;
 			return p2 + d;
 		}
-		public bool IsShotCharged
-		{
-			get
-			{
-				return isShotCharged;
-			}
-		}
 
-		public bool WantsToShoot
+		public ScreenText GetLaserChargePercentText(Font font)
 		{
-			get
-			{
-				return wantsToShoot;
-			}
-		}
-
-		public bool WantsToLaser
-		{
-			get
-			{
-				return wantsToLaser;
-			}
-		}
-
-		public ScreenText GetLaserChargePercent(Font font)
-		{
-			int percent = (int)Math.Round(laserReserve/ (laserLifetime * 1.0) * 100.0f);
-			Color c = percent < laserActivationPercent ? Color.Red : Color.Green;
-			string laserState = percent < laserActivationPercent ? "LASER CHARGING:" : "LASER CHARGED:";
-			ScreenText scoreText = new ScreenText(laserState + percent.ToString() + "%", font, Constants.Fonts.bigFontSize, c);
+			string str = secondaryWeapon.GetTextInfo();
+			ScreenText scoreText = new ScreenText(str, font, Constants.Fonts.bigFontSize, Color.White);
 			return scoreText;
+		}
+
+		public void CheckButtonEvents(float dt, Stopwatch sw)
+		{
+			if (Keyboard.IsKeyPressed(Keyboard.Key.Up))
+			{
+				movement.Accelerate(-1);
+				hasThrust = true;
+			}
+
+			if (Keyboard.IsKeyPressed(Keyboard.Key.Right)) movement.Rotate(1);
+			else if (Keyboard.IsKeyPressed(Keyboard.Key.Left)) movement.Rotate(-1);
+
+			if (Keyboard.IsKeyPressed(Keyboard.Key.Space)) usePrimaryWeapon = true;
+
+			if (Keyboard.IsKeyPressed(Keyboard.Key.LControl)) useSecondaryWeapon = true;
+			else useSecondaryWeapon = false;
 		}
 	}
 }

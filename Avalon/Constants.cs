@@ -49,11 +49,8 @@
 		{
 			public const float shipSize = 50; //Время для зарядки выстрелов из плазмогана
 
-			public const int shotChargingTime = 100; //Время для зарядки выстрелов из плазмогана (мс)
 			public const float rotationPower = 50; //Сила вращения
 			public const float accelerationPower = 1; //Ускорение
-			public const long laserLifeTime = 5000; //мс
-			public const float laserActivationPercent = 70;
 
 			//Инерция
 			public const float speedLimit = 500; //запас скорости
@@ -77,6 +74,17 @@
 			public const float length = 3000;   //длина лазера
 			public const float baseDamage = 20;
 			public const float lifetime = 1; //существование лазера, такты перерисовки
+		}
+
+		public class LaserGun
+		{
+			public const long laserLifeTime = 5000; //мс
+			public const float laserActivationPercent = 70;
+		}
+
+		public class MissleGun
+		{
+			public const int shotChargingTime = 100; //Время для зарядки выстрелов из плазмогана (мс)
 		}
 	}
 }

@@ -9,9 +9,8 @@ using static Avalon.Game;
 
 namespace Avalon.Entities
 {
-	public class Projectile : Weapon
+	public class Projectile : Shot
 	{
-		private bool isExpired = false;
 		private float lifeTimeCounter = 0.0f;
 		private float maxLifetime;
 
@@ -58,14 +57,6 @@ namespace Avalon.Entities
 			if (lifeTimeCounter > maxLifetime) isExpired = true;
 			lifeTimeCounter++;
 			base.Update(dt, sw);
-		}
-
-		public bool IsExpired
-		{
-			get
-			{
-				return isExpired;
-			}
 		}
 
 		public override float Hit()
